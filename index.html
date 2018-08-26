@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Simple imgur uploader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      #app {
+        width: 500px;
+        margin: 0 auto;
+      }
+
+      ul {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 490px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      ul li {
+        margin: 16px;
+      }
+
+      ul li img {
+        width: 200px;
+        height: 150px;
+        object-fit: contain;
+      }
+
+      input[type='file'] {
+        appearance: none;
+        -webkit-appearance: none;
+        display: block;
+        background: #fafafa;
+        width: 100%;
+        height: 100px;
+        text-align: center;
+      }
+
+      input[type='text'] {
+        padding: 8px;
+        width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <p v-if="busy">
+        uploading...
+      </p>
+      <form>
+        <p>
+          <label>
+            imgur token: <input type="password" v-model="token">
+          </label>
+        </p>
+        <input type="file" @change="upload">
+      </form>
+      <ul>
+        <li v-for="item in items">
+          <img :src="item" alt="" width="200"><br>
+          <input type="text" readonly :value="item">
+        </li>
+      </ul>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script>
+      function createBlobImageFromDataURI(dataURI) {
+        const byteString = atob(dataURI.split(',')[1])
+        const type = dataURI
+          .split(',')[0]
+          .split(':')[1]
+          .split(';')[0]
+        const ab = new ArrayBuffer(byteString.length)
+        let ia = new Uint8Array(ab)
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i)
+        }
+        return new Blob([ab], { type })
+      }
+
+      new Vue({
+        el: '#app',
+        data() {
+          return {
+            busy: false,
+            token: localStorage.getItem('token') || '',
+            items: JSON.parse(localStorage.getItem('items') || '[]')
+          }
+        },
+        watch: {
+          token(val) {
+            localStorage.setItem('token', val)
+          },
+          items(val) {
+            localStorage.setItem('items', JSON.stringify(val))
+          }
+        },
+        methods: {
+          upload(event) {
+            try {
+              const { files } = event.target
+              const file = files[0]
+              const params = new FormData()
+              const reader = new FileReader()
+              reader.onload = async ({ currentTarget: { result } }) => {
+                axios.defaults.headers.authorization = 'Client-ID ' + this.token
+                this.items.unshift(result)
+                params.append('image', createBlobImageFromDataURI(result))
+                const { data } = await axios.post('https://api.imgur.com/3/image', params)
+                setTimeout(() => {
+                  this.items = this.items.map(i => (i === result ? data.data.link : i))
+                  this.busy = false
+                }, 500)
+              }
+              reader.readAsDataURL(file)
+            } catch (e) {
+              alert('だめぽ')
+              this.busy = false
+            }
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
