@@ -26,6 +26,9 @@ ul {
 }
 
 .upload-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 200px !important;
   position: relative !important;
   flex-direction: column !important;
