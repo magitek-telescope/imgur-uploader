@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "format": "prettier './**/*.{html,css,js,md}' --write"
+    "format": "prettier './**/*.{css,js,md}' --write"
   },
   "devDependencies": {
     "prettier": "^1.16.4"
