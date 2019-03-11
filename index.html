@@ -9,6 +9,31 @@
   </head>
   <body>
     <div id="app" class="p-4">
+      <div class="fixed-bottom d-flex justify-content-end bg-light">
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" @click="clearUploads" class="btn btn-light rounded-0">
+            <small>
+              <b>
+                Clear uploads
+              </b>
+            </small>
+          </button>
+          <a href="https://www.patreon.com/potato4d" class="btn btn-light rounded-0">
+            <small>
+              <b>
+                Donate
+              </b>
+            </small>
+          </a>
+          <button type="button" class="btn btn-light rounded-0">
+            <small>
+              <b>
+                v0.1.0
+              </b>
+            </small>
+          </button>
+        </div>
+      </div>
       <div class="text-center">
         <h1 class="text-muted">
           <img src="./images/logo.svg" width="60" alt="logo" /><br />
@@ -16,7 +41,7 @@
         </h1>
       </div>
       <div class="container" v-cloak>
-        <p v-if="busy">
+        <p v-if="busy" class="uploading">
           uploading...
         </p>
         <form class="px-3">

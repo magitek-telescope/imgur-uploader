@@ -28,6 +28,9 @@ const storage = {
   },
   save(key, value) {
     return localStorage.setItem('IMGUR_UPLOADER_' + key.toUpperCase(), value)
+  },
+  clear(key) {
+    return localStorage.removeItem('IMGUR_UPLOADER_' + key.toUpperCase())
   }
 }
 
@@ -49,15 +52,21 @@ new Vue({
     }
   },
   methods: {
+    clearUploads() {
+      if (!window.confirm('Are you sure?')) {
+        return
+      }
+      this.items = []
+    },
     applyLink(raw, link) {
       this.items = this.items.map(item => (item === raw ? link : item))
     },
     upload(event) {
       if (!this.token) {
-        alert('トークンを設定してください')
+        alert('Imgur token is missing.')
         return
       }
-      this.busy = false
+      this.busy = true
       try {
         const { files } = event.target
         const file = files[0]
@@ -80,7 +89,7 @@ new Vue({
         }
         reader.readAsDataURL(file)
       } catch (e) {
-        alert('エラーが発生しました')
+        alert('Error')
         this.busy = false
       }
     }

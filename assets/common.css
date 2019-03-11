@@ -10,6 +10,21 @@ ul {
   list-style: none;
 }
 
+.uploading {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
 .upload-area {
   height: 200px !important;
   position: relative !important;
