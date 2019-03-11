@@ -1,4 +1,7 @@
 {
+  "name": "@potato4d/imgur-uploader",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
     "format": "prettier './**/*.{css,js,md}' --write"
   },
