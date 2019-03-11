@@ -12,24 +12,46 @@ function createBlobImageFromDataURI(dataURI) {
   return new Blob([ab], { type })
 }
 
+const delay = ms => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve()
+    }, ms)
+  })
+}
+
+const storage = {
+  get(key, fallback) {
+    return (
+      localStorage.getItem('IMGUR_UPLOADER_' + key.toUpperCase()) || fallback
+    )
+  },
+  save(key, value) {
+    return localStorage.setItem('IMGUR_UPLOADER_' + key.toUpperCase(), value)
+  }
+}
+
 new Vue({
   el: '#app',
   data() {
     return {
       busy: false,
-      token: localStorage.getItem('token') || '',
-      items: JSON.parse(localStorage.getItem('items') || '[]')
+      token: storage.get('token', ''),
+      items: JSON.parse(storage.get('items', '[]'))
     }
   },
   watch: {
     token(val) {
-      localStorage.setItem('token', val)
+      storage.save('token', val)
     },
     items(val) {
-      localStorage.setItem('items', JSON.stringify(val))
+      storage.save('items', JSON.stringify(val))
     }
   },
   methods: {
+    applyLink(raw, link) {
+      this.items = this.items.map(item => (item === raw ? link : item))
+    },
     upload(event) {
       if (!this.token) {
         alert('トークンを設定してください')
@@ -52,16 +74,13 @@ new Vue({
             'https://api.imgur.com/3/image',
             params
           )
-          setTimeout(() => {
-            this.items = this.items.map(i =>
-              i === result ? data.data.link : i
-            )
-            this.busy = false
-          }, 1000)
+          await delay(1000)
+          this.applyLink(result, data.data.link)
+          this.busy = false
         }
         reader.readAsDataURL(file)
       } catch (e) {
-        alert('だめぽ')
+        alert('エラーが発生しました')
         this.busy = false
       }
     }
