@@ -39,6 +39,9 @@ new Vue({
       try {
         const { files } = event.target
         const file = files[0]
+        if (!file) {
+          return
+        }
         const params = new FormData()
         const reader = new FileReader()
         reader.onload = async ({ currentTarget: { result } }) => {
